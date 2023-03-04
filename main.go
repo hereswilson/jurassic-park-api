@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/hereswilson/jurassic-park-api/database"
+	"github.com/hereswilson/jurassic-park-api/models"
 	"github.com/hereswilson/jurassic-park-api/routes"
 	"github.com/joho/godotenv"
 )
@@ -16,6 +17,14 @@ func loadEnv() {
 	}
 }
 
+func loadDatabase() {
+	database.Connect()
+	err := database.DB.AutoMigrate(&models.Cage{}, &models.Dinosaur{}, &models.Species{})
+	if err != nil {
+		log.Fatal("Error loading database migrations")
+	}
+}
+
 func main() {
 	loadEnv()
 	r := gin.Default()
@@ -23,7 +32,7 @@ func main() {
 	router := r.Group("/api/v1")
 	routes.AddRoutes(router)
 
-	database.Connect()
+	loadDatabase()
 
 	r.Run()
 }

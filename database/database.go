@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/hereswilson/jurassic-park-api/models"
-
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -26,10 +24,6 @@ func Connect() {
 		panic(err)
 	} else {
 		fmt.Println("Successfully connected to the database")
-	}
-	err = database.AutoMigrate(&models.Cage{}, &models.Dinosaur{}, &models.Species{})
-	if err != nil {
-		return
 	}
 
 	DB = database

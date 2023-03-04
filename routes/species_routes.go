@@ -8,14 +8,14 @@ import (
 func speciesRoutes(superRoute *gin.RouterGroup) {
 	speciesRouter := superRoute.Group("/species")
 	{
-		speciesRouter.GET("/", controllers.SpeciesControllers.GetSpecies)
+		speciesRouter.GET("/", controllers.GetSpecies)
 
-		speciesRouter.POST("/", controllers.SpeciesControllers.CreateSpecies)
+		speciesRouter.POST("/", controllers.CreateSpecies)
 
-		speciesRouter.GET("/:id", controllers.SpeciesControllers.GetSpeciesByID)
+		speciesRouter.GET("/:species", controllers.GetSpecificSpecies)
 
-		speciesRouter.PUT("/:id", controllers.SpeciesControllers.UpdateSpecies)
+		speciesRouter.PUT("/:species", controllers.UpdateSpecies)
 
-		speciesRouter.DELETE("/:id", controllers.SpeciesControllers.DeleteSpecies)
+		speciesRouter.DELETE("/:species", controllers.DeleteSpecies)
 	}
 }

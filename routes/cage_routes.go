@@ -8,14 +8,14 @@ import (
 func cageRoutes(superRoute *gin.RouterGroup) {
 	cageRouter := superRoute.Group("/cages")
 	{
-		cageRouter.GET("/", controllers.CageControllers.GetCages)
+		cageRouter.GET("/", controllers.GetCages)
 
-		cageRouter.POST("/", controllers.CageControllers.CreateCage)
+		cageRouter.POST("/", controllers.CreateCage)
 
-		cageRouter.GET("/:id", controllers.CageControllers.GetCageByID)
+		cageRouter.GET("/:name", controllers.GetCageByName)
 
-		cageRouter.PUT("/:id", controllers.CageControllers.UpdateCage)
+		cageRouter.PUT("/:name", controllers.UpdateCage)
 
-		cageRouter.DELETE("/:id", controllers.CageControllers.DeleteCage)
+		cageRouter.DELETE("/:name", controllers.DeleteCage)
 	}
 }

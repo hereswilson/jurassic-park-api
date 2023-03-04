@@ -8,14 +8,14 @@ import (
 func dinosaurRoutes(superRoute *gin.RouterGroup) {
 	dinosaurRouter := superRoute.Group("/dinosaurs")
 	{
-		dinosaurRouter.GET("/", controllers.DinosaurControllers.GetDinosaurs)
+		dinosaurRouter.GET("/", controllers.GetDinosaurs)
 
-		dinosaurRouter.POST("/", controllers.DinosaurControllers.CreateDinosaur)
+		dinosaurRouter.POST("/", controllers.CreateDinosaur)
 
-		dinosaurRouter.GET("/:id", controllers.DinosaurControllers.GetDinosaurByID)
+		dinosaurRouter.GET("/:name", controllers.GetDinosaurByName)
 
-		dinosaurRouter.PUT("/:id", controllers.DinosaurControllers.UpdateDinosaur)
+		dinosaurRouter.PUT("/:name", controllers.UpdateDinosaur)
 
-		dinosaurRouter.DELETE("/:id", controllers.DinosaurControllers.DeleteDinosaur)
+		dinosaurRouter.DELETE("/:name", controllers.DeleteDinosaur)
 	}
 }
