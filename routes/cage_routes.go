@@ -6,16 +6,19 @@ import (
 )
 
 func cageRoutes(superRoute *gin.RouterGroup) {
+	cageController := &controllers.CageController{}
 	cageRouter := superRoute.Group("/cages")
 	{
-		cageRouter.GET("/", controllers.GetCages)
+		cageRouter.GET("/", cageController.GetCages)
 
-		cageRouter.POST("/", controllers.CreateCage)
+		cageRouter.POST("/", cageController.CreateCage)
 
-		cageRouter.GET("/:name", controllers.GetCageByName)
+		cageRouter.GET("/:name", cageController.GetCageByName)
 
-		cageRouter.PUT("/:name", controllers.UpdateCage)
+		cageRouter.PUT("/:name", cageController.UpdateCage)
 
-		cageRouter.DELETE("/:name", controllers.DeleteCage)
+		cageRouter.DELETE("/:name", cageController.DeleteCage)
+
+		cageRouter.GET("/:name/dinosaurs", cageController.GetDinosaursInCage)
 	}
 }

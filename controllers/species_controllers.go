@@ -7,7 +7,9 @@ import (
 	"github.com/hereswilson/jurassic-park-api/models"
 )
 
-func GetSpecies(c *gin.Context) {
+type SpeciesController struct{}
+
+func (ctrl *SpeciesController) GetSpecies(c *gin.Context) {
 	species, err := models.GetSpecies()
 	if err != nil {
 		c.AbortWithStatus(http.StatusNotFound)
@@ -15,7 +17,7 @@ func GetSpecies(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, species)
 }
 
-func CreateSpecies(c *gin.Context) {
+func (ctrl *SpeciesController) CreateSpecies(c *gin.Context) {
 	var species models.Species
 	if err := c.ShouldBindJSON(&species); err != nil {
 		c.AbortWithStatus(http.StatusBadRequest)
@@ -27,7 +29,7 @@ func CreateSpecies(c *gin.Context) {
 	c.IndentedJSON(http.StatusCreated, newSpecies)
 }
 
-func GetSpecificSpecies(c *gin.Context) {
+func (ctrl *SpeciesController) GetSpecificSpecies(c *gin.Context) {
 	name := c.Param("species")
 	species, err := models.GetSpecificSpecies(name)
 	if err != nil {
@@ -36,7 +38,7 @@ func GetSpecificSpecies(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, species)
 }
 
-func UpdateSpecies(c *gin.Context) {
+func (ctrl *SpeciesController) UpdateSpecies(c *gin.Context) {
 	specName := c.Param("species")
 	var species models.Species
 	if err := c.ShouldBindJSON(&species); err != nil {
@@ -49,7 +51,7 @@ func UpdateSpecies(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, species)
 }
 
-func DeleteSpecies(c *gin.Context) {
+func (ctrl *SpeciesController) DeleteSpecies(c *gin.Context) {
 	specName := c.Param("species")
 	var species models.Species
 	err := species.DeleteSpecies(specName)

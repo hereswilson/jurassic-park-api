@@ -6,16 +6,17 @@ import (
 )
 
 func speciesRoutes(superRoute *gin.RouterGroup) {
+	speciesController := &controllers.SpeciesController{}
 	speciesRouter := superRoute.Group("/species")
 	{
-		speciesRouter.GET("/", controllers.GetSpecies)
+		speciesRouter.GET("/", speciesController.GetSpecies)
 
-		speciesRouter.POST("/", controllers.CreateSpecies)
+		speciesRouter.POST("/", speciesController.CreateSpecies)
 
-		speciesRouter.GET("/:species", controllers.GetSpecificSpecies)
+		speciesRouter.GET("/:species", speciesController.GetSpecificSpecies)
 
-		speciesRouter.PUT("/:species", controllers.UpdateSpecies)
+		speciesRouter.PUT("/:species", speciesController.UpdateSpecies)
 
-		speciesRouter.DELETE("/:species", controllers.DeleteSpecies)
+		speciesRouter.DELETE("/:species", speciesController.DeleteSpecies)
 	}
 }

@@ -7,12 +7,13 @@ import (
 
 type Species struct {
 	gorm.Model
-	Species string `json:"species" gorm:"type:text not null; unique"`
-	Diet    string `json:"diet" gorm:"type:text not null"`
+	Species string `json:"species" gorm:"type:text; not null; unique"`
+	Diet    string `json:"diet" gorm:"type:text; not null"`
 }
 
-func GetSpecies() (species []Species, err error) {
-	err = database.DB.Find(&species).Error
+func GetSpecies() ([]Species, error) {
+	var species []Species
+	err := database.DB.Find(&species).Error
 	return species, err
 }
 

@@ -6,16 +6,23 @@ import (
 )
 
 func dinosaurRoutes(superRoute *gin.RouterGroup) {
+	dinosaurController := &controllers.DinosaurController{}
 	dinosaurRouter := superRoute.Group("/dinosaurs")
 	{
-		dinosaurRouter.GET("/", controllers.GetDinosaurs)
+		dinosaurRouter.GET("/", dinosaurController.GetDinosaurs)
 
-		dinosaurRouter.POST("/", controllers.CreateDinosaur)
+		dinosaurRouter.POST("/", dinosaurController.CreateDinosaur)
 
-		dinosaurRouter.GET("/:name", controllers.GetDinosaurByName)
+		dinosaurRouter.GET("/:name", dinosaurController.GetDinosaurByName)
 
-		dinosaurRouter.PUT("/:name", controllers.UpdateDinosaur)
+		dinosaurRouter.PUT("/:name", dinosaurController.UpdateDinosaur)
 
-		dinosaurRouter.DELETE("/:name", controllers.DeleteDinosaur)
+		dinosaurRouter.DELETE("/:name", dinosaurController.DeleteDinosaur)
+
+		dinosaurRouter.POST("/:name/add-to-cage/:cage_name", dinosaurController.AddDinosaurToCage)
+
+		dinosaurRouter.POST("/:name/remove-from-cage", dinosaurController.RemoveDinosaurFromCage)
+
+		dinosaurRouter.GET("/filter-by-species/:species", dinosaurController.FilterDinosaursBySpecies)
 	}
 }
