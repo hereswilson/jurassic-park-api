@@ -3,10 +3,17 @@ package routes
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/hereswilson/jurassic-park-api/controllers"
+	"github.com/hereswilson/jurassic-park-api/services"
+	"github.com/hereswilson/jurrasic-park-api/repositories"
+	"gorm.io/gorm"
 )
 
-func dinosaurRoutes(superRoute *gin.RouterGroup) {
-	dinosaurController := &controllers.DinosaurController{}
+func dinosaurRoutes(superRoute *gin.RouterGroup, db *gorm.DB) {
+	dinoRepo := repositories.NewDinosaurRepository(db)
+	cageRepo := repositories.NewCageRepository(db)
+	speciesRepo := repositories.NewSpeciesRepository(db)
+	dinoService := services.NewDinosaurService(dinoRepo, cageRepo, speciesRepo)
+	dinosaurController := controllers.NewDinosaurController(dinoService)
 	dinosaurRouter := superRoute.Group("/dinosaurs")
 	{
 		dinosaurRouter.GET("/", dinosaurController.GetDinosaurs)
