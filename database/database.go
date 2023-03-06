@@ -9,8 +9,6 @@ import (
 	"gorm.io/gorm"
 )
 
-var db *gorm.DB
-
 func ConnectDB() (*gorm.DB, error) {
 	host := os.Getenv("DB_HOST")
 	username := os.Getenv("DB_USER")
@@ -41,7 +39,7 @@ func MigrateDB(db *gorm.DB) error {
 func SeedDB(db *gorm.DB) error {
 	// Seed the database with initial data
 	brachiosaurus := &models.Species{Species: "Brachiosaurus", Diet: "Herbivore"}
-	stegosaurus := &models.Species{Species: "Stegosaurus,", Diet: "Herbivore"}
+	stegosaurus := &models.Species{Species: "Stegosaurus", Diet: "Herbivore"}
 	ankylosaurus := &models.Species{Species: "Ankylosaurus", Diet: "Herbivore"}
 	triceratops := &models.Species{Species: "Triceratops", Diet: "Herbivore"}
 	tyrannosaurus := &models.Species{Species: "Tyrannosaurus", Diet: "Carnivore"}
