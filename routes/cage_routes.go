@@ -4,8 +4,8 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/hereswilson/jurassic-park-api/controllers"
+	"github.com/hereswilson/jurassic-park-api/repositories"
 	"github.com/hereswilson/jurassic-park-api/services"
-	"github.com/hereswilson/jurrasic-park-api/repositories"
 
 	"gorm.io/gorm"
 )

@@ -31,7 +31,7 @@ func NewCageRepository(db *gorm.DB) CageRepository {
 
 func (c *cageRepository) GetCageByName(name string) (*models.Cage, error) {
 	var cage models.Cage
-	result := c.db.First(&cage, name)
+	result := c.db.Where("name = ?", name)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			return nil, models.ErrCageNotFound
@@ -75,9 +75,9 @@ func (c *cageRepository) GetAllCages() ([]models.Cage, error) {
 	return cages, err
 }
 
-func (r *cageRepository) GetCagesByPowerStatus(powerStatus string) ([]models.Cage, error) {
+func (c *cageRepository) GetCagesByPowerStatus(powerStatus string) ([]models.Cage, error) {
 	var cages []models.Cage
-	result := r.db.Where("power_status = ?", powerStatus).Find(&cages)
+	result := c.db.Where("power_status = ?", powerStatus).Find(&cages)
 	if result.Error != nil {
 		return nil, result.Error
 	}
