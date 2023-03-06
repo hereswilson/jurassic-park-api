@@ -62,7 +62,8 @@ func (c *cageRepository) DeleteCageByName(name string) error {
 	if err != nil {
 		return err
 	}
-	result := c.db.Delete(cage)
+
+	result := c.db.Where("name = ?", name).Delete(&cage)
 	if result.Error != nil {
 		return result.Error
 	}
