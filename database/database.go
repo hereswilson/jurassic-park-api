@@ -5,16 +5,31 @@ import (
 	"os"
 
 	"github.com/hereswilson/jurassic-park-api/models"
+	"github.com/spf13/viper"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
 func ConnectDB() (*gorm.DB, error) {
-	host := os.Getenv("DB_HOST")
-	username := os.Getenv("DB_USER")
-	password := os.Getenv("DB_PASSWORD")
-	databaseName := os.Getenv("DB_NAME")
-	port := os.Getenv("DB_PORT")
+	var host, username, password, databaseName, port string
+	_, local := os.LookupEnv("DB_HOST")
+	if local {
+		host = os.Getenv("DB_HOST")
+		username = os.Getenv("DB_USER")
+		password = os.Getenv("DB_PASSWORD")
+		databaseName = os.Getenv("DB_NAME")
+		port = os.Getenv("DB_PORT")
+	} else {
+		viper.SetConfigFile("ENV")
+		viper.ReadInConfig()
+		viper.AutomaticEnv()
+
+		host = fmt.Sprint(viper.Get("DB_HOST"))
+		username = fmt.Sprint(viper.Get("DB_USER"))
+		password = fmt.Sprint(viper.Get("DB_PASSWORD"))
+		databaseName = fmt.Sprint(viper.Get("DB_NAME"))
+		port = fmt.Sprint(viper.Get("DB_PORT"))
+	}
 
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable", host, username, password, databaseName, port)
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
