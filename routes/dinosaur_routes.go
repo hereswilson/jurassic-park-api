@@ -20,7 +20,7 @@ func dinosaurRoutes(superRoute *gin.RouterGroup, db *gorm.DB) {
 
 		dinosaurRouter.POST("/", dinosaurController.CreateDinosaur)
 
-		dinosaurRouter.GET("/:name", dinosaurController.GetDinosaurByName)
+		dinosaurRouter.GET("/", dinosaurController.GetDinosaurByName)
 
 		dinosaurRouter.PUT("/:name", dinosaurController.UpdateDinosaur)
 
