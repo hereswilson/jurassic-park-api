@@ -4,13 +4,14 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/hereswilson/jurassic-park-api/models"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
-var DB *gorm.DB
+var db *gorm.DB
 
-func Connect() {
+func ConnectDB() (*gorm.DB, error) {
 	host := os.Getenv("DB_HOST")
 	username := os.Getenv("DB_USER")
 	password := os.Getenv("DB_PASSWORD")
@@ -18,13 +19,67 @@ func Connect() {
 	port := os.Getenv("DB_PORT")
 
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable", host, username, password, databaseName, port)
-	database, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 
 	if err != nil {
-		panic(err)
+		return nil, fmt.Errorf("failed to connect to database: %v", err)
 	} else {
 		fmt.Println("Successfully connected to the database")
 	}
 
-	DB = database
+	return db, nil
+}
+
+func MigrateDB(db *gorm.DB) error {
+	err := db.AutoMigrate(&models.Species{}, &models.Dinosaur{}, &models.Cage{})
+	if err != nil {
+		return fmt.Errorf("failed to migrate database: %v", err)
+	}
+	return nil
+}
+
+func SeedDB(db *gorm.DB) error {
+	// Seed the database with initial data
+	brachiosaurus := &models.Species{Species: "Brachiosaurus", Diet: "Herbivore"}
+	stegosaurus := &models.Species{Species: "Stegosaurus,", Diet: "Herbivore"}
+	ankylosaurus := &models.Species{Species: "Ankylosaurus", Diet: "Herbivore"}
+	triceratops := &models.Species{Species: "Triceratops", Diet: "Herbivore"}
+	tyrannosaurus := &models.Species{Species: "Tyrannosaurus", Diet: "Carnivore"}
+	velociraptor := &models.Species{Species: "Velociraptor", Diet: "Carnivore"}
+	spinosaurus := &models.Species{Species: "Spinosaurus", Diet: "Carnivore"}
+	megalosaurus := &models.Species{Species: "Megalosaurus", Diet: "Carnivore"}
+	err := db.Create(brachiosaurus).Error
+	if err != nil {
+		return fmt.Errorf("failed to seed database: %v", err)
+	}
+	err = db.Create(stegosaurus).Error
+	if err != nil {
+		return fmt.Errorf("failed to seed database: %v", err)
+	}
+	err = db.Create(ankylosaurus).Error
+	if err != nil {
+		return fmt.Errorf("failed to seed database: %v", err)
+	}
+	err = db.Create(triceratops).Error
+	if err != nil {
+		return fmt.Errorf("failed to seed database: %v", err)
+	}
+	err = db.Create(tyrannosaurus).Error
+	if err != nil {
+		return fmt.Errorf("failed to seed database: %v", err)
+	}
+	err = db.Create(velociraptor).Error
+	if err != nil {
+		return fmt.Errorf("failed to seed database: %v", err)
+	}
+	err = db.Create(spinosaurus).Error
+	if err != nil {
+		return fmt.Errorf("failed to seed database: %v", err)
+	}
+	err = db.Create(megalosaurus).Error
+	if err != nil {
+		return fmt.Errorf("failed to seed database: %v", err)
+	}
+
+	return nil
 }

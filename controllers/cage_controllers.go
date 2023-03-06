@@ -5,92 +5,91 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/hereswilson/jurassic-park-api/models"
+	"github.com/hereswilson/jurassic-park-api/services"
 )
 
-// Error responses
-var (
-	ErrNotFound   = gin.H{"error": "Resource not found"}
-	ErrBadRequest = gin.H{"error": "Bad request"}
-	ErrInternal   = gin.H{"error": "Internal server error"}
-)
-
-type CageController struct{}
-
-func (ctrl *CageController) GetCages(c *gin.Context) {
-	cages, err := models.GetCages()
-	if err != nil {
-		c.AbortWithStatus(http.StatusNotFound)
-		return
-	}
-	c.IndentedJSON(http.StatusOK, cages)
+type CageController struct {
+	cageService *services.CageService
 }
 
-func (ctrl *CageController) CreateCage(c *gin.Context) {
+func NewCageController(cageService *services.CageService) *CageController {
+	return &CageController{cageService: cageService}
+}
+
+func (c *CageController) GetCages(ctx *gin.Context) {
+	cages, err := c.cageService.GetCages()
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	ctx.JSON(http.StatusOK, cages)
+}
+
+func (c *CageController) CreateCage(ctx *gin.Context) {
 	var cage models.Cage
-	if err := c.ShouldBindJSON(&cage); err != nil {
-		c.AbortWithStatus(http.StatusBadRequest)
+	if err := ctx.ShouldBindJSON(&cage); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	err := models.CreateCage(&cage)
+	newCage, err := c.cageService.CreateCage(&cage)
 	if err != nil {
-		c.AbortWithStatus(http.StatusInternalServerError)
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.IndentedJSON(http.StatusCreated, cage)
+	ctx.JSON(http.StatusCreated, newCage)
 }
 
-func (ctrl *CageController) GetCageByName(c *gin.Context) {
-	name := c.Param("name")
-	cage, err := models.GetCageByName(name)
+func (c *CageController) GetCageByName(ctx *gin.Context) {
+	cageName := ctx.Param("name")
+	cage, err := c.cageService.GetCageByName(cageName)
 	if err != nil {
-		c.AbortWithStatus(http.StatusNotFound)
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.IndentedJSON(http.StatusOK, cage)
+	if cage == nil {
+		ctx.JSON(http.StatusNotFound, gin.H{"error": "cage not found"})
+		return
+	}
+	ctx.JSON(http.StatusOK, cage)
 }
 
-func (ctrl *CageController) UpdateCage(c *gin.Context) {
-	name := c.Param("name")
+func (c *CageController) UpdateCage(ctx *gin.Context) {
+	cageName := ctx.Param("name")
 	var cage models.Cage
-	if err := c.ShouldBindJSON(&cage); err != nil {
-		c.AbortWithStatus(http.StatusBadRequest)
+	if err := ctx.ShouldBindJSON(&cage); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	err := cage.UpdateCage(name)
+
+	cage.Name = cageName
+	updatedCage, err := c.cageService.UpdateCageByName(&cage)
 	if err != nil {
-		c.AbortWithStatus(http.StatusInternalServerError)
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.IndentedJSON(http.StatusOK, cage)
+
+	ctx.JSON(http.StatusOK, updatedCage)
 }
 
-func (ctrl *CageController) DeleteCage(c *gin.Context) {
-	name := c.Param("name")
-	var cage models.Cage
-	err := cage.DeleteCage(name)
+func (c *CageController) DeleteCage(ctx *gin.Context) {
+	cageName := ctx.Param("name")
+	err := c.cageService.DeleteCageByName(cageName)
 	if err != nil {
-		c.AbortWithStatus(http.StatusInternalServerError)
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.IndentedJSON(http.StatusOK, gin.H{"message": "Cage deleted successfully!"})
+
+	ctx.Status(http.StatusOK)
 }
 
-func (ctrl *CageController) GetDinosaursInCage(c *gin.Context) {
-	name := c.Param("name")
-	dinosaurs, err := models.GetDinosaursInCage(name)
-	if err != nil {
-		c.AbortWithStatus(http.StatusNotFound)
-		return
-	}
-	c.IndentedJSON(http.StatusOK, dinosaurs)
-}
+func (c *CageController) GetDinosaursInCage(ctx *gin.Context) {
+	cageName := ctx.Param("name")
 
-func (ctrl *CageController) FilterCagesByPowerStatus(c *gin.Context) {
-	powerStatus := c.Query("power_status")
-	cages, err := models.FilterCagesByPowerStatus(powerStatus)
+	dinosaurs, err := c.cageService.GetDinosaursInCage(cageName)
 	if err != nil {
-		c.AbortWithStatus(http.StatusInternalServerError)
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.IndentedJSON(http.StatusOK, cages)
+
+	ctx.JSON(http.StatusOK, dinosaurs)
 }

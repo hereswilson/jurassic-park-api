@@ -5,162 +5,105 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/hereswilson/jurassic-park-api/models"
+	"github.com/hereswilson/jurassic-park-api/services"
 )
 
-type DinosaurController struct{}
-
-// GetDinosaursInCage returns a list of dinosaurs in a specific cage
-func (dc *DinosaurController) GetDinosaursInCage(c *gin.Context) {
-	cageName := c.Param("cageName")
-
-	dinosaurs, err := models.GetDinosaursInCage(cageName)
-	if err != nil {
-		c.AbortWithStatus(http.StatusNotFound)
-		return
-	}
-
-	c.IndentedJSON(http.StatusOK, dinosaurs)
+type DinosaurController struct {
+	dinoService *services.DinosaurService
 }
 
-// GetDinosaurs returns a list of all dinosaurs
-func (dc *DinosaurController) GetDinosaurs(c *gin.Context) {
-	dinosaurs, err := models.GetDinosaurs()
-	if err != nil {
-		c.AbortWithStatus(http.StatusNotFound)
-		return
-	}
-	c.IndentedJSON(http.StatusOK, dinosaurs)
+func NewDinosaurController(dinoService *services.DinosaurService) *DinosaurController {
+	return &DinosaurController{dinoService}
 }
 
-// GetDinosaur returns a single dinosaur by name
-func (dc *DinosaurController) GetDinosaurByName(c *gin.Context) {
-	name := c.Param("name")
-
-	dinosaur, err := models.GetDinosaurByName(name)
+func (c *DinosaurController) GetDinosaurs(ctx *gin.Context) {
+	dinosaurs, err := c.dinoService.GetAllDinosaurs()
 	if err != nil {
-		c.AbortWithStatus(http.StatusNotFound)
+		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-
-	c.IndentedJSON(http.StatusOK, dinosaur)
+	ctx.JSON(http.StatusOK, dinosaurs)
 }
 
-// CreateDinosaur creates a new dinosaur
-func (dc *DinosaurController) CreateDinosaur(c *gin.Context) {
+func (c *DinosaurController) CreateDinosaur(ctx *gin.Context) {
 	var dinosaur models.Dinosaur
-	if err := c.ShouldBindJSON(&dinosaur); err != nil {
-		c.AbortWithStatus(http.StatusBadRequest)
-		return
-	}
-
-	newDinosaur, err := models.CreateDinosaur(&dinosaur)
+	err := ctx.ShouldBindJSON(&dinosaur)
 	if err != nil {
-		c.AbortWithStatus(http.StatusInternalServerError)
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-
-	c.IndentedJSON(http.StatusCreated, newDinosaur)
+	cage, err := c.dinoService.CreateDinosaur(&dinosaur)
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	ctx.JSON(http.StatusCreated, cage)
 }
 
-// UpdateDinosaur updates an existing dinosaur by name
-func (dc *DinosaurController) UpdateDinosaur(c *gin.Context) {
-	name := c.Param("name")
+func (c *DinosaurController) GetDinosaurByName(ctx *gin.Context) {
+	name := ctx.Param("name")
+	dinosaur, err := c.dinoService.GetDinosaurByName(name)
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		return
+	}
+	ctx.JSON(http.StatusOK, dinosaur)
+}
 
+func (c *DinosaurController) UpdateDinosaur(ctx *gin.Context) {
+	name := ctx.Param("name")
 	var dinosaur models.Dinosaur
-	if err := c.ShouldBindJSON(&dinosaur); err != nil {
-		c.AbortWithStatus(http.StatusBadRequest)
-		return
-	}
-
-	err := dinosaur.UpdateDinosaur(name)
+	err := ctx.ShouldBindJSON(&dinosaur)
 	if err != nil {
-		c.AbortWithStatus(http.StatusNotFound)
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-
-	c.IndentedJSON(http.StatusOK, dinosaur)
+	dinosaur.Name = name
+	err = c.dinoService.UpdateDinosaur(&dinosaur)
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	ctx.Status(http.StatusNoContent)
 }
 
-// DeleteDinosaur deletes a dinosaur by name
-func (dc *DinosaurController) DeleteDinosaur(c *gin.Context) {
-	name := c.Param("name")
-
-	var dinosaur models.Dinosaur
-	err := dinosaur.DeleteDinosaur(name)
+func (c *DinosaurController) DeleteDinosaur(ctx *gin.Context) {
+	name := ctx.Param("name")
+	err := c.dinoService.DeleteDinosaurByName(name)
 	if err != nil {
-		c.AbortWithStatus(http.StatusNotFound)
+		ctx.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
 	}
-
-	c.IndentedJSON(http.StatusOK, gin.H{"message": "Dinosaur deleted successfully!"})
+	ctx.Status(http.StatusNoContent)
 }
 
-func (dc *DinosaurController) FilterDinosaursBySpecies(c *gin.Context) {
-	species := c.Query("species")
-	if species == "" {
-		c.AbortWithStatus(http.StatusBadRequest)
-		return
-	}
-
-	dinosaurs, err := models.GetDinosaursBySpecies(species)
+func (c *DinosaurController) AddDinosaurToCage(ctx *gin.Context) {
+	name := ctx.Param("name")
+	cageName := ctx.Param("cage_name")
+	dinosaur, err := c.dinoService.AddDinosaurToCage(name, cageName)
 	if err != nil {
-		c.AbortWithStatus(http.StatusInternalServerError)
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-
-	c.IndentedJSON(http.StatusOK, dinosaurs)
+	ctx.JSON(http.StatusOK, dinosaur)
 }
 
-// Function to add a dinosaur to a cage
-func (dc *DinosaurController) AddDinosaurToCage(c *gin.Context) {
-	dinosaurName := c.Param("name")
-	cageName := c.Param("cage_name")
-
-	// Get the cage by name
-	cage, err := models.GetCageByName(cageName)
+func (c *DinosaurController) RemoveDinosaurFromCage(ctx *gin.Context) {
+	name := ctx.Param("name")
+	err := c.dinoService.RemoveDinosaurFromCage(name)
 	if err != nil {
-		c.AbortWithStatus(http.StatusNotFound)
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-
-	dinosaur, err := models.GetDinosaurByName(dinosaurName)
-	if err != nil {
-		c.AbortWithStatus(http.StatusNotFound)
-		return
-	}
-
-	// Add the dinosaur to the cage
-	err = cage.AddDinosaur(&dinosaur)
-	if err != nil {
-		c.AbortWithStatus(http.StatusInternalServerError)
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{"message": "Dinosaur added to cage successfully!"})
+	ctx.Status(http.StatusNoContent)
 }
 
-// RemoveDinosaurFromCage removes the dinosaur with the given ID from its current cage
-func (dc *DinosaurController) RemoveDinosaurFromCage(c *gin.Context) {
-	dinosaurName := c.Param("name")
-
-	dinosaur, err := models.GetDinosaurByName(dinosaurName)
+func (c *DinosaurController) FilterDinosaursBySpecies(ctx *gin.Context) {
+	species := ctx.Param("species")
+	dinosaurs, err := c.dinoService.GetDinosaursBySpecies(species)
 	if err != nil {
-		c.AbortWithStatus(http.StatusNotFound)
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-
-	// Get the cage where the dinosaur is currently located
-	cage, err := models.GetCageForDinosaur(dinosaurName)
-	if err != nil {
-		c.AbortWithStatus(http.StatusNotFound)
-		return
-	}
-
-	// Remove the dinosaur from its cage
-	err = cage.RemoveDinosaur(&dinosaur)
-	if err != nil {
-		c.AbortWithStatus(http.StatusInternalServerError)
-		return
-	}
-	c.IndentedJSON(http.StatusOK, gin.H{"message": "Dinosaur removed from cage successfully!"})
+	ctx.JSON(http.StatusOK, dinosaurs)
 }

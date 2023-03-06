@@ -5,58 +5,92 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/hereswilson/jurassic-park-api/models"
+	"github.com/hereswilson/jurassic-park-api/services"
 )
 
-type SpeciesController struct{}
-
-func (ctrl *SpeciesController) GetSpecies(c *gin.Context) {
-	species, err := models.GetSpecies()
-	if err != nil {
-		c.AbortWithStatus(http.StatusNotFound)
-	}
-	c.IndentedJSON(http.StatusOK, species)
+type SpeciesController struct {
+	speciesService *services.SpeciesService
 }
 
-func (ctrl *SpeciesController) CreateSpecies(c *gin.Context) {
+func NewSpeciesController(speciesService *services.SpeciesService) *SpeciesController {
+	return &SpeciesController{
+		speciesService: speciesService,
+	}
+}
+
+func (c *SpeciesController) GetSpecies(ctx *gin.Context) {
+	species, err := c.speciesService.GetAllSpecies()
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, species)
+}
+
+func (c *SpeciesController) CreateSpecies(ctx *gin.Context) {
 	var species models.Species
-	if err := c.ShouldBindJSON(&species); err != nil {
-		c.AbortWithStatus(http.StatusBadRequest)
-	}
-	newSpecies, err := models.CreateSpecies(&species)
+	err := ctx.BindJSON(&species)
 	if err != nil {
-		c.AbortWithStatus(http.StatusNotFound)
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
 	}
-	c.IndentedJSON(http.StatusCreated, newSpecies)
+
+	createdSpecies, err := c.speciesService.CreateSpecies(&species)
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	ctx.JSON(http.StatusCreated, createdSpecies)
 }
 
-func (ctrl *SpeciesController) GetSpecificSpecies(c *gin.Context) {
-	name := c.Param("species")
-	species, err := models.GetSpecificSpecies(name)
+func (c *SpeciesController) GetSpecificSpecies(ctx *gin.Context) {
+	speciesName := ctx.Param("species")
+
+	species, err := c.speciesService.GetSpeciesByName(speciesName)
 	if err != nil {
-		c.AbortWithStatus(http.StatusNotFound)
+		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
 	}
-	c.IndentedJSON(http.StatusOK, species)
+
+	if species == nil {
+		ctx.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": "species not found"})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, species)
 }
 
-func (ctrl *SpeciesController) UpdateSpecies(c *gin.Context) {
-	specName := c.Param("species")
+func (c *SpeciesController) UpdateSpecies(ctx *gin.Context) {
+	speciesName := ctx.Param("species")
+
 	var species models.Species
-	if err := c.ShouldBindJSON(&species); err != nil {
-		c.AbortWithStatus(http.StatusBadRequest)
-	}
-	err := species.UpdateSpecies(specName)
+	err := ctx.BindJSON(&species)
 	if err != nil {
-		c.AbortWithStatus(http.StatusNotFound)
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
 	}
-	c.IndentedJSON(http.StatusOK, species)
+
+	species.Species = speciesName
+
+	updatedSpecies, err := c.speciesService.UpdateSpecies(&species)
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, updatedSpecies)
 }
 
-func (ctrl *SpeciesController) DeleteSpecies(c *gin.Context) {
-	specName := c.Param("species")
-	var species models.Species
-	err := species.DeleteSpecies(specName)
+func (c *SpeciesController) DeleteSpecies(ctx *gin.Context) {
+	speciesName := ctx.Param("species")
+
+	err := c.speciesService.DeleteSpecies(speciesName)
 	if err != nil {
-		c.AbortWithStatus(http.StatusNotFound)
+		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
 	}
-	c.IndentedJSON(http.StatusOK, gin.H{"message": "Species deleted successfully!"})
+
+	ctx.Status(http.StatusNoContent)
 }
