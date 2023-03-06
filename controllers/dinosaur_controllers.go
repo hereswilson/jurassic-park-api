@@ -41,7 +41,7 @@ func (c *DinosaurController) CreateDinosaur(ctx *gin.Context) {
 }
 
 func (c *DinosaurController) GetDinosaurByName(ctx *gin.Context) {
-	name := ctx.Param("name")
+	name := ctx.Query("name")
 	dinosaur, err := c.dinoService.GetDinosaurByName(name)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": err.Error()})
@@ -51,7 +51,7 @@ func (c *DinosaurController) GetDinosaurByName(ctx *gin.Context) {
 }
 
 func (c *DinosaurController) UpdateDinosaur(ctx *gin.Context) {
-	name := ctx.Param("name")
+	name := ctx.Query("name")
 	var dinosaur models.Dinosaur
 	err := ctx.ShouldBindJSON(&dinosaur)
 	if err != nil {
@@ -68,7 +68,7 @@ func (c *DinosaurController) UpdateDinosaur(ctx *gin.Context) {
 }
 
 func (c *DinosaurController) DeleteDinosaur(ctx *gin.Context) {
-	name := ctx.Param("name")
+	name := ctx.Query("name")
 	err := c.dinoService.DeleteDinosaurByName(name)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": err.Error()})
@@ -78,8 +78,8 @@ func (c *DinosaurController) DeleteDinosaur(ctx *gin.Context) {
 }
 
 func (c *DinosaurController) AddDinosaurToCage(ctx *gin.Context) {
-	name := ctx.Param("name")
-	cageName := ctx.Param("cage_name")
+	name := ctx.Query("name")
+	cageName := ctx.Query("cage_name")
 	dinosaur, err := c.dinoService.AddDinosaurToCage(name, cageName)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -89,7 +89,7 @@ func (c *DinosaurController) AddDinosaurToCage(ctx *gin.Context) {
 }
 
 func (c *DinosaurController) RemoveDinosaurFromCage(ctx *gin.Context) {
-	name := ctx.Param("name")
+	name := ctx.Query("name")
 	err := c.dinoService.RemoveDinosaurFromCage(name)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -99,7 +99,7 @@ func (c *DinosaurController) RemoveDinosaurFromCage(ctx *gin.Context) {
 }
 
 func (c *DinosaurController) FilterDinosaursBySpecies(ctx *gin.Context) {
-	species := ctx.Param("species")
+	species := ctx.Query("species")
 	dinosaurs, err := c.dinoService.GetDinosaursBySpecies(species)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})

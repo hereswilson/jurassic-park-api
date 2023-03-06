@@ -40,7 +40,7 @@ func (c *CageController) CreateCage(ctx *gin.Context) {
 }
 
 func (c *CageController) GetCageByName(ctx *gin.Context) {
-	cageName := ctx.Param("name")
+	cageName := ctx.Query("name")
 	cage, err := c.cageService.GetCageByName(cageName)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -54,7 +54,7 @@ func (c *CageController) GetCageByName(ctx *gin.Context) {
 }
 
 func (c *CageController) UpdateCage(ctx *gin.Context) {
-	cageName := ctx.Param("name")
+	cageName := ctx.Query("name")
 	var cage models.Cage
 	if err := ctx.ShouldBindJSON(&cage); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -72,7 +72,7 @@ func (c *CageController) UpdateCage(ctx *gin.Context) {
 }
 
 func (c *CageController) DeleteCage(ctx *gin.Context) {
-	cageName := ctx.Param("name")
+	cageName := ctx.Query("name")
 	err := c.cageService.DeleteCageByName(cageName)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -83,7 +83,7 @@ func (c *CageController) DeleteCage(ctx *gin.Context) {
 }
 
 func (c *CageController) GetDinosaursInCage(ctx *gin.Context) {
-	cageName := ctx.Param("name")
+	cageName := ctx.Query("name")
 
 	dinosaurs, err := c.cageService.GetDinosaursInCage(cageName)
 	if err != nil {

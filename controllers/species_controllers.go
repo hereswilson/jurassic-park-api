@@ -46,7 +46,7 @@ func (c *SpeciesController) CreateSpecies(ctx *gin.Context) {
 }
 
 func (c *SpeciesController) GetSpecificSpecies(ctx *gin.Context) {
-	speciesName := ctx.Param("species")
+	speciesName := ctx.Query("species")
 
 	species, err := c.speciesService.GetSpeciesByName(speciesName)
 	if err != nil {
@@ -63,7 +63,7 @@ func (c *SpeciesController) GetSpecificSpecies(ctx *gin.Context) {
 }
 
 func (c *SpeciesController) UpdateSpecies(ctx *gin.Context) {
-	speciesName := ctx.Param("species")
+	speciesName := ctx.Query("species")
 
 	var species models.Species
 	err := ctx.BindJSON(&species)
@@ -84,7 +84,7 @@ func (c *SpeciesController) UpdateSpecies(ctx *gin.Context) {
 }
 
 func (c *SpeciesController) DeleteSpecies(ctx *gin.Context) {
-	speciesName := ctx.Param("species")
+	speciesName := ctx.Query("species")
 
 	err := c.speciesService.DeleteSpecies(speciesName)
 	if err != nil {
