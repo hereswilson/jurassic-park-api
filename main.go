@@ -12,9 +12,21 @@ import (
 
 func loadEnv() {
 
-	err := godotenv.Load("ENV")
+	err := godotenv.Load()
 	if err != nil {
-		log.Fatalf("Some error occured. Err: %s", err)
+		log.Println("Error loading environment file")
+	}
+	err = godotenv.Load(".env")
+	if err != nil {
+		log.Println("Error loading .env environment file")
+	}
+	err = godotenv.Load(".ENV")
+	if err != nil {
+		log.Println("Error loading .ENV environment file")
+	}
+	err = godotenv.Load("ENV")
+	if err != nil {
+		log.Println("Error loading ENV environment file")
 	}
 
 }
