@@ -1,3 +1,4 @@
 .env
 .env.local
 jurassic-park-api
+ENV
