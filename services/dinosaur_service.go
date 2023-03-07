@@ -66,6 +66,7 @@ func (s *DinosaurService) CreateDinosaur(dinosaur *models.Dinosaur) (*models.Cag
 	}
 
 	cage.DinosaurCount++
+	cage.Dinosaurs = append(cage.Dinosaurs, *dinosaur)
 
 	err = s.dinoRepo.CreateDinosaur(dinosaur)
 	if err != nil {
@@ -170,7 +171,15 @@ func (s *DinosaurService) AddDinosaurToCage(name, cageName string) (*models.Dino
 	cage.DinosaurCount++
 	dinosaur.CageID = cage.ID
 
-	s.UpdateDinosaur(dinosaur)
+	err = s.UpdateDinosaur(dinosaur)
+	if err != nil {
+		return nil, err
+	}
+
+	err = s.cageRepo.AddDinosaur(cage, dinosaur)
+	if err != nil {
+		return nil, err
+	}
 
 	_, err = s.cageRepo.UpdateCage(cage)
 	if err != nil {
@@ -202,7 +211,15 @@ func (s *DinosaurService) RemoveDinosaurFromCage(name string) error {
 	cage.DinosaurCount--
 	dinosaur.CageID = 0
 
-	s.UpdateDinosaur(dinosaur)
+	err = s.UpdateDinosaur(dinosaur)
+	if err != nil {
+		return err
+	}
+
+	err = s.cageRepo.RemoveDinosaur(cage, dinosaur)
+	if err != nil {
+		return err
+	}
 
 	_, err = s.cageRepo.UpdateCage(cage)
 	if err != nil {

@@ -20,12 +20,12 @@ func cageRoutes(superRoute *gin.RouterGroup, db *gorm.DB) {
 
 		cageRouter.POST("/", cageController.CreateCage)
 
-		cageRouter.GET("/:name", cageController.GetCageByName)
+		cageRouter.GET("/name", cageController.GetCageByName)
 
-		cageRouter.PUT("/:name", cageController.UpdateCage)
+		cageRouter.PUT("/", cageController.UpdateCage)
 
-		cageRouter.DELETE("/:name", cageController.DeleteCage)
+		cageRouter.DELETE("/", cageController.DeleteCage)
 
-		cageRouter.GET("/:name/dinosaurs", cageController.GetDinosaursInCage)
+		cageRouter.GET("/dinosaurs", cageController.GetDinosaursInCage)
 	}
 }

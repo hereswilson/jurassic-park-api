@@ -63,7 +63,6 @@ func (c *SpeciesController) GetSpecificSpecies(ctx *gin.Context) {
 }
 
 func (c *SpeciesController) UpdateSpecies(ctx *gin.Context) {
-	speciesName := ctx.Query("species")
 
 	var species models.Species
 	err := ctx.BindJSON(&species)
@@ -71,8 +70,6 @@ func (c *SpeciesController) UpdateSpecies(ctx *gin.Context) {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-
-	species.Species = speciesName
 
 	updatedSpecies, err := c.speciesService.UpdateSpecies(&species)
 	if err != nil {

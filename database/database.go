@@ -44,7 +44,7 @@ func ConnectDB() (*gorm.DB, error) {
 }
 
 func MigrateDB(db *gorm.DB) error {
-	err := db.AutoMigrate(&models.Species{}, &models.Dinosaur{}, &models.Cage{})
+	err := db.AutoMigrate(&models.Cage{}, &models.Species{}, &models.Dinosaur{})
 	if err != nil {
 		return fmt.Errorf("failed to migrate database: %v", err)
 	}

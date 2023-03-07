@@ -2,7 +2,6 @@ package main
 
 import (
 	"log"
-	"os"
 
 	"github.com/gin-gonic/gin"
 	"github.com/hereswilson/jurassic-park-api/database"
@@ -12,12 +11,10 @@ import (
 )
 
 func loadEnv() {
-	env := os.Getenv("ENV")
-	if env == "" {
-		err := godotenv.Load(".env.local")
-		if err != nil {
-			log.Fatal("Error loading local .env file")
-		}
+
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
 	}
 
 }

@@ -20,16 +20,16 @@ func dinosaurRoutes(superRoute *gin.RouterGroup, db *gorm.DB) {
 
 		dinosaurRouter.POST("/", dinosaurController.CreateDinosaur)
 
-		dinosaurRouter.GET("/", dinosaurController.GetDinosaurByName)
+		dinosaurRouter.GET("/name", dinosaurController.GetDinosaurByName)
 
-		dinosaurRouter.PUT("/:name", dinosaurController.UpdateDinosaur)
+		dinosaurRouter.PUT("/", dinosaurController.UpdateDinosaur)
 
-		dinosaurRouter.DELETE("/:name", dinosaurController.DeleteDinosaur)
+		dinosaurRouter.DELETE("/", dinosaurController.DeleteDinosaur)
 
-		dinosaurRouter.POST("/:name/add-to-cage/:cage_name", dinosaurController.AddDinosaurToCage)
+		dinosaurRouter.POST("/add-to-cage/", dinosaurController.AddDinosaurToCage)
 
-		dinosaurRouter.POST("/:name/remove-from-cage", dinosaurController.RemoveDinosaurFromCage)
+		dinosaurRouter.POST("/remove-from-cage/", dinosaurController.RemoveDinosaurFromCage)
 
-		dinosaurRouter.GET("/filter-by-species/:species", dinosaurController.FilterDinosaursBySpecies)
+		dinosaurRouter.GET("/filter-by-species/", dinosaurController.FilterDinosaursBySpecies)
 	}
 }

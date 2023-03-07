@@ -18,10 +18,10 @@ func speciesRoutes(superRoute *gin.RouterGroup, db *gorm.DB) {
 
 		speciesRouter.POST("/", speciesController.CreateSpecies)
 
-		speciesRouter.GET("/:species", speciesController.GetSpecificSpecies)
+		speciesRouter.GET("/species", speciesController.GetSpecificSpecies)
 
-		speciesRouter.PUT("/:species", speciesController.UpdateSpecies)
+		speciesRouter.PUT("/", speciesController.UpdateSpecies)
 
-		speciesRouter.DELETE("/:species", speciesController.DeleteSpecies)
+		speciesRouter.DELETE("/", speciesController.DeleteSpecies)
 	}
 }

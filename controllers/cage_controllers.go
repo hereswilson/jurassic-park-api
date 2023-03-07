@@ -54,14 +54,12 @@ func (c *CageController) GetCageByName(ctx *gin.Context) {
 }
 
 func (c *CageController) UpdateCage(ctx *gin.Context) {
-	cageName := ctx.Query("name")
 	var cage models.Cage
 	if err := ctx.ShouldBindJSON(&cage); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	cage.Name = cageName
 	updatedCage, err := c.cageService.UpdateCageByName(&cage)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})

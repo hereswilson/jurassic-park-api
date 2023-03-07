@@ -18,7 +18,8 @@ type CageRepository interface {
 	GetDinosaurs(string) ([]models.Dinosaur, error)
 	GetDinosaursBySpecies(string, string) ([]models.Dinosaur, error)
 	GetNumDinosaurs(string) (int64, error)
-	AddDinosaur(*models.Dinosaur) error
+	AddDinosaur(*models.Cage, *models.Dinosaur) error
+	RemoveDinosaur(*models.Cage, *models.Dinosaur) error
 }
 
 type cageRepository struct {
@@ -119,10 +120,18 @@ func (c *cageRepository) GetNumDinosaurs(cageName string) (int64, error) {
 	return count, err
 }
 
-func (c *cageRepository) AddDinosaur(dinosaur *models.Dinosaur) error {
-	result := c.db.Create(dinosaur)
-	if result.Error != nil {
-		return result.Error
+func (c *cageRepository) AddDinosaur(cage *models.Cage, dinosaur *models.Dinosaur) error {
+	err := c.db.Model(cage).Association("Dinosaurs").Append(dinosaur)
+	if err != nil {
+		return err
 	}
-	return nil
+	return err
+}
+
+func (c *cageRepository) RemoveDinosaur(cage *models.Cage, dinosaur *models.Dinosaur) error {
+	err := c.db.Model(cage).Association("Dinosaurs").Delete(dinosaur)
+	if err != nil {
+		return err
+	}
+	return err
 }

@@ -51,14 +51,14 @@ func (c *DinosaurController) GetDinosaurByName(ctx *gin.Context) {
 }
 
 func (c *DinosaurController) UpdateDinosaur(ctx *gin.Context) {
-	name := ctx.Query("name")
+
 	var dinosaur models.Dinosaur
 	err := ctx.ShouldBindJSON(&dinosaur)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	dinosaur.Name = name
+
 	err = c.dinoService.UpdateDinosaur(&dinosaur)
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
